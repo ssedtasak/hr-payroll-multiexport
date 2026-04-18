@@ -1,7 +1,7 @@
 // Validation Engine
 // Validates payroll data before export
 
-import { EmployeeGroupType } from '../models/payroll.js';
+import { EmployeeGroupType, calculateEmployeeTotals } from '../models/payroll.js';
 
 /**
  * Validation result object
@@ -116,9 +116,8 @@ export function validateForKBank(doc) {
       errors.push(`Row ${rowNum}: Bank account number is required`);
     }
 
-    // Account name comes from employee Name, so it's always filled
-    // But check if netPay is valid
-    const totals = emp.calculated || {};
+    // Calculate netPay to validate it's positive
+    const totals = calculateEmployeeTotals(emp);
     if (totals.netPay <= 0) {
       errors.push(`Row ${rowNum}: Net pay must be greater than 0 for bank transfer`);
     }

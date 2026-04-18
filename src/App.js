@@ -737,7 +737,7 @@ function renderMasterEmployeeList() {
         <span class="master-item-badge ${emp.groupType === 'social_security' ? 'ss' : 'wt'}">
           ${emp.groupType === 'social_security' ? 'SS' : 'WT'}
         </span>
-        <span class="master-item-bank"> | ${emp.bankInfo?.bankAccountNumber || '-'} | ${emp.bankInfo?.bankCode || '-'}</span>
+        <span class="master-item-bank"> | ${escapeHtml(emp.bankInfo?.bankAccountNumber || '-')} | ${escapeHtml(emp.bankInfo?.bankCode || '-')}</span>
       </div>
       <div class="master-item-actions">
         <button class="master-item-btn master-add-btn" data-add-from-master="${emp.id}">+ เพิ่ม</button>

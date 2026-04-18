@@ -23,6 +23,20 @@ const THIN_BORDER = {
 };
 
 /**
+ * Prevents formula injection by prefixing strings that start with =, +, -, @, \t, \r
+ * @param {string} value - User input value
+ * @returns {string} Safe value for Excel
+ */
+function safeCellValue(value) {
+  if (typeof value !== 'string') return value;
+  // Prefix dangerous characters to prevent formula execution
+  if (/^[=+\-@\t\r]/.test(value)) {
+    return "'" + value;
+  }
+  return value;
+}
+
+/**
  * Helper function to create KBank sheet with employee data
  * @param {ExcelJS.Workbook} workbook 
  * @param {Object[]} employees - Filtered employees
@@ -54,7 +68,7 @@ async function createKBankSheet(workbook, employees, doc, sheetName) {
 
   // Row 1: Summary section with colors
   sheet.getCell('A1').value = 'Total No. of Transaction / จำนวนรายการทั้งหมด ';
-  sheet.getCell('A1').font = { bold: true, color: 'FFFFFFFF' };
+  sheet.getCell('A1').font = { bold: true, color: { argb: 'FFFFFFFF' } };
   sheet.getCell('A1').fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: COLORS.GREEN_HEADER } };
   
   // COUNTA formula for transaction count (data starts at row 4)
@@ -62,7 +76,7 @@ async function createKBankSheet(workbook, employees, doc, sheetName) {
   sheet.getCell('B1').fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: COLORS.GRAY_SUMMARY } };
   
   sheet.getCell('C1').value = 'Total Amount / จำนวนเงินทั้งหมด ';
-  sheet.getCell('C1').font = { bold: true, color: 'FFFFFFFF' };
+  sheet.getCell('C1').font = { bold: true, color: { argb: 'FFFFFFFF' } };
   sheet.getCell('C1').fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: COLORS.GREEN_HEADER } };
   
   // SUM formula for total amount
@@ -88,7 +102,7 @@ async function createKBankSheet(workbook, employees, doc, sheetName) {
   headers.forEach((header, i) => {
     const cell = headerRow.getCell(i + 1);
     cell.value = header;
-    cell.font = { bold: true, color: 'FFFFFFFF' };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.alignment = { wrapText: true, vertical: 'top', horizontal: 'center' };
     cell.fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: COLORS.GREEN_HEADER } };
     cell.border = THIN_BORDER;
@@ -116,14 +130,14 @@ async function createKBankSheet(workbook, employees, doc, sheetName) {
     // Account Number - Yellow (input field in reference)
     // Force text type to preserve leading zeros (e.g., "0123456")
     const cell2 = row.getCell(2);
-    cell2.value = String(emp.bankInfo.bankAccountNumber);
+    cell2.value = String(safeCellValue(emp.bankInfo.bankAccountNumber));
     cell2.dataType = 'string';
     cell2.fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: COLORS.YELLOW_INPUT } };
     cell2.border = THIN_BORDER;
     
     // Account Name - Light gray (calculated from name)
     const cell3 = row.getCell(3);
-    cell3.value = emp.fullName;
+    cell3.value = safeCellValue(emp.fullName);
     cell3.fill = { type: 'patternFill', pattern: 'solid', fgColor: { rgb: rowColor } };
     cell3.border = THIN_BORDER;
     

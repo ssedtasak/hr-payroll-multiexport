@@ -180,7 +180,7 @@ export async function generateEmployeeTemplate() {
   columns.forEach((col, idx) => {
     const cell = headerRow.getCell(idx + 1);
     cell.value = col.header;
-    cell.font = { bold: true, color: 'FFFFFFFF' };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.fill = headerFill;
     cell.border = thinBorder;
     cell.alignment = { horizontal: 'center' };
@@ -293,7 +293,6 @@ export async function parseEmployeeTemplate(buffer) {
   }
 
   const employees = [];
-  const errors = [];
 
   // Get headers from row 1
   const headerRow = sheet.getRow(1);
@@ -326,9 +325,9 @@ export async function parseEmployeeTemplate(buffer) {
     'No Work No Pay': 'noWorkNoPay',
   };
 
-  // Parse data rows (starting from row 3, row 2 is blank/sample)
+  // Parse data rows (skip header row 1 + 2 sample rows 2-3)
   sheet.eachRow({ includeEmpty: false }, (row, rowNum) => {
-    if (rowNum < 3) return; // Skip header and sample rows
+    if (rowNum < 4) return; // Skip header and sample rows
 
     const rowData = {};
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
