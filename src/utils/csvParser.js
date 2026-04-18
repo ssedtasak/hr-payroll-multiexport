@@ -79,7 +79,7 @@ export function parseEmployeeCSV(csvText) {
 }
 
 /**
- * Parse a single CSV line handling quotes
+ * Parse a single CSV line handling quotes and escaped quotes
  */
 function parseCSVLine(line) {
   const result = [];
@@ -90,7 +90,13 @@ function parseCSVLine(line) {
     const char = line[i];
     
     if (char === '"') {
-      inQuotes = !inQuotes;
+      // Check for escaped quote ""
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++; // Skip next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
     } else if (char === ',' && !inQuotes) {
       result.push(current);
       current = '';
